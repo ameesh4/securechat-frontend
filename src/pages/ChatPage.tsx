@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ConversationList } from "../components/ConversationList";
 import { ChatWindow } from "../components/ChatWindow";
@@ -6,6 +6,7 @@ import { UserProfile } from "../components/UserProfile";
 import { SettingsPanel } from "../components/SettingsPanel";
 import { useUserStore } from "../store/userStore";
 import React from "react";
+import { getSocket, initSocket } from "../utils/Socket";
 
 export interface Conversation {
   id: string;
@@ -163,6 +164,13 @@ export function ChatPage() {
     switchToAdmin();
     navigate("/admin");
   };
+
+  useEffect(() => {
+    const socket = getSocket();
+    if (socket) {
+      socket.emit("message", "Hello from frontend");
+    }
+  }, []);
 
   const handleSendMessage = (content: string) => {
     if (!selectedConversation) return;

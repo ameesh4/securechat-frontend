@@ -64,10 +64,14 @@ export function AuthPage() {
     e.preventDefault();
     try {
       const keyPair = RSA();
-      const b64_public_key = bigintToBase64(keyPair.n)
-      const b64_private_key = bigintToBase64(keyPair.d)
+      const b64_public_key = bigintToBase64(keyPair.n);
+      const b64_private_key = bigintToBase64(keyPair.d);
 
-      const response = await signup({ email, password, public_key: b64_public_key });
+      const response = await signup({
+        email,
+        password,
+        public_key: b64_public_key,
+      });
       if (response) {
         localStorage.setItem("private_key", b64_private_key);
         toast("Signup successful", {
@@ -95,7 +99,7 @@ export function AuthPage() {
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 mb-4">
             <MessageSquare className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-gray-900 mb-2">ChatApp</h1>
+          <h1 className="text-gray-900 mb-2">SecureChat</h1>
           <p className="text-gray-600">Connect with your team instantly</p>
         </div>
 
@@ -154,13 +158,9 @@ export function AuthPage() {
                   </button>
                 </CardContent>
                 <CardFooter className="flex flex-col gap-2">
-                  <Button type="submit" className="w-full">
+                  <Button type="submit" className="w-full mt-4">
                     Sign In
                   </Button>
-                  <p className="text-sm text-gray-600 text-center">
-                    Demo: Use any email (try "admin@example.com" for admin
-                    access)
-                  </p>
                 </CardFooter>
               </form>
             </Card>
@@ -223,7 +223,7 @@ export function AuthPage() {
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button type="submit" className="w-full">
+                  <Button type="submit" className="w-full mt-4">
                     Create Account
                   </Button>
                 </CardFooter>
