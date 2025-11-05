@@ -22,6 +22,7 @@ import { useUserStore } from "../store/userStore";
 import React from "react";
 import { login, signup } from "../utils/API";
 import { toast } from "sonner";
+import { bigintToBase64, RSA } from "../utils/AES";
 
 export function AuthPage() {
   const navigate = useNavigate();
@@ -62,8 +63,13 @@ export function AuthPage() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await signup({ email, password });
+      const keyPair = RSA();
+      const b64_public_key = bigintToBase64(keyPair.n)
+      const b64_private_key = bigintToBase64(keyPair.d)
+
+      const response = await signup({ email, password, public_key: b64_public_key });
       if (response) {
+        localStorage.setItem("private_key", b64_private_key);
         toast("Signup successful", {
           description: "You can now login to your account.",
         });

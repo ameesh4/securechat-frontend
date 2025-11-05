@@ -1,6 +1,7 @@
 export type SignupData = {
   email: string;
   password: string;
+  public_key: string;
 };
 
 export type LoginData = {
