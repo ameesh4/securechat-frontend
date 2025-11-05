@@ -12,6 +12,7 @@ import { AdminPage } from "./pages/AdminPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { useUserStore } from "./store/userStore";
 import { validateToken } from "./utils/API";
+import { initSocket } from "./utils/Socket";
 
 function AppRoutes() {
   const user = useUserStore((state) => state.user);
@@ -40,6 +41,17 @@ function AppRoutes() {
 
   useEffect(() => {
     authenticateUser();
+  }, []);
+
+  useEffect(() => {
+    const socket = initSocket();
+
+    socket.on("welcome", (msg) => console.log("👋", msg));
+
+    socket.on("message", (data) => {
+      console.log("📩 Received:", data);
+      // You could dispatch this to Redux/store
+    });
   }, []);
 
   return (
