@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import type { Conversation } from "./ChatInterface";
 import React from "react";
+import NewChatPanel from "./NewChatPanel";
 
 interface ConversationListProps {
   conversations: Conversation[];
@@ -44,6 +45,7 @@ export function ConversationList({
   onShowSettings,
 }: ConversationListProps) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [newChatOpen, setNewChatOpen] = useState(false);
 
   const filteredConversations = conversations.filter((conv) =>
     conv.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -66,7 +68,11 @@ export function ConversationList({
 
       {/* New Chat Button */}
       <div className="p-4 border-b border-gray-200">
-        <Button className="w-full" variant="outline">
+        <Button
+          className="w-full"
+          variant="outline"
+          onClick={() => setNewChatOpen(true)}
+        >
           <Plus className="w-4 h-4 mr-2" />
           New Chat
         </Button>
@@ -129,7 +135,7 @@ export function ConversationList({
           <div className="flex items-center gap-3 min-w-0">
             <Avatar>
               <AvatarImage src="https://images.unsplash.com/photo-1704726135027-9c6f034cfa41?w=150" />
-              <AvatarFallback>{user.name[0]}</AvatarFallback>
+              <AvatarFallback></AvatarFallback>
             </Avatar>
             <div className="min-w-0">
               <div className="flex items-center gap-2">
@@ -172,6 +178,10 @@ export function ConversationList({
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+        </div>
+
+        <div className="absolute bottom-0 left-0 right-0 top-0">
+          <NewChatPanel open={newChatOpen} onOpenChange={setNewChatOpen} />
         </div>
       </div>
     </>

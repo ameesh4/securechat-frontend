@@ -1,10 +1,24 @@
-import { useState, useRef, useEffect } from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
-import { Phone, Video, MoreVertical, Send, Paperclip, Smile, Image } from 'lucide-react';
-import type { Conversation, Message } from './ChatInterface';
+import { useState, useRef, useEffect } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import {
+  Phone,
+  Video,
+  MoreVertical,
+  Send,
+  Paperclip,
+  Smile,
+  Image,
+} from "lucide-react";
+import type { Conversation, Message } from "./ChatInterface";
+import React from "react";
 
 interface ChatWindowProps {
   conversation: Conversation;
@@ -12,12 +26,16 @@ interface ChatWindowProps {
   onSendMessage: (content: string) => void;
 }
 
-export function ChatWindow({ conversation, messages, onSendMessage }: ChatWindowProps) {
-  const [messageInput, setMessageInput] = useState('');
+export function ChatWindow({
+  conversation,
+  messages,
+  onSendMessage,
+}: ChatWindowProps) {
+  const [messageInput, setMessageInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(() => {
@@ -28,7 +46,7 @@ export function ChatWindow({ conversation, messages, onSendMessage }: ChatWindow
     e.preventDefault();
     if (messageInput.trim()) {
       onSendMessage(messageInput);
-      setMessageInput('');
+      setMessageInput("");
     }
   };
 
@@ -50,30 +68,9 @@ export function ChatWindow({ conversation, messages, onSendMessage }: ChatWindow
             <div>
               <p>{conversation.name}</p>
               <p className="text-sm text-gray-500">
-                {conversation.isOnline ? 'Online' : 'Offline'}
+                {conversation.isOnline ? "Online" : "Offline"}
               </p>
             </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon">
-              <Phone className="w-5 h-5" />
-            </Button>
-            <Button variant="ghost" size="icon">
-              <Video className="w-5 h-5" />
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <MoreVertical className="w-5 h-5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem>View Profile</DropdownMenuItem>
-                <DropdownMenuItem>Mute Notifications</DropdownMenuItem>
-                <DropdownMenuItem>Search in Conversation</DropdownMenuItem>
-                <DropdownMenuItem className="text-red-600">Delete Conversation</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
         </div>
       </div>
@@ -84,9 +81,15 @@ export function ChatWindow({ conversation, messages, onSendMessage }: ChatWindow
           {messages.map((message) => (
             <div
               key={message.id}
-              className={`flex ${message.isOwn ? 'justify-end' : 'justify-start'}`}
+              className={`flex ${
+                message.isOwn ? "justify-end" : "justify-start"
+              }`}
             >
-              <div className={`flex gap-2 max-w-[70%] ${message.isOwn ? 'flex-row-reverse' : 'flex-row'}`}>
+              <div
+                className={`flex gap-2 max-w-[70%] ${
+                  message.isOwn ? "flex-row-reverse" : "flex-row"
+                }`}
+              >
                 {!message.isOwn && (
                   <Avatar className="w-8 h-8">
                     <AvatarImage src={conversation.avatar} />
@@ -95,18 +98,24 @@ export function ChatWindow({ conversation, messages, onSendMessage }: ChatWindow
                 )}
                 <div>
                   {!message.isOwn && conversation.isGroup && (
-                    <p className="text-xs text-gray-600 mb-1 ml-1">{message.senderName}</p>
+                    <p className="text-xs text-gray-600 mb-1 ml-1">
+                      {message.senderName}
+                    </p>
                   )}
                   <div
                     className={`rounded-2xl px-4 py-2 ${
                       message.isOwn
-                        ? 'bg-blue-600 text-white rounded-tr-sm'
-                        : 'bg-white text-gray-900 rounded-tl-sm border border-gray-200'
+                        ? "bg-blue-600 text-white rounded-tr-sm"
+                        : "bg-white text-gray-900 rounded-tl-sm border border-gray-200"
                     }`}
                   >
                     <p>{message.content}</p>
                   </div>
-                  <p className={`text-xs text-gray-500 mt-1 ${message.isOwn ? 'text-right' : 'text-left'} ml-1`}>
+                  <p
+                    className={`text-xs text-gray-500 mt-1 ${
+                      message.isOwn ? "text-right" : "text-left"
+                    } ml-1`}
+                  >
                     {message.timestamp}
                   </p>
                 </div>
@@ -121,23 +130,19 @@ export function ChatWindow({ conversation, messages, onSendMessage }: ChatWindow
       <div className="p-4 border-t border-gray-200 bg-white">
         <form onSubmit={handleSend} className="flex items-end gap-2">
           <div className="flex-1 bg-gray-100 rounded-2xl px-4 py-2 flex items-center gap-2">
-            <Button type="button" variant="ghost" size="icon" className="h-8 w-8">
-              <Paperclip className="w-5 h-5 text-gray-500" />
-            </Button>
-            <Button type="button" variant="ghost" size="icon" className="h-8 w-8">
-              <Image className="w-5 h-5 text-gray-500" />
-            </Button>
             <Input
               value={messageInput}
               onChange={(e) => setMessageInput(e.target.value)}
               placeholder="Type a message..."
               className="flex-1 bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 px-0"
             />
-            <Button type="button" variant="ghost" size="icon" className="h-8 w-8">
-              <Smile className="w-5 h-5 text-gray-500" />
-            </Button>
           </div>
-          <Button type="submit" size="icon" className="rounded-full h-10 w-10" disabled={!messageInput.trim()}>
+          <Button
+            type="submit"
+            size="icon"
+            className="rounded-full h-10 w-10"
+            disabled={!messageInput.trim()}
+          >
             <Send className="w-5 h-5" />
           </Button>
         </form>
