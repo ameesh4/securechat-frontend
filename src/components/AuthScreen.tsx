@@ -12,7 +12,6 @@ import {
 } from "./ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { MessageSquare, Mail, Lock, User } from "lucide-react";
-import React from "react";
 
 interface AuthScreenProps {
   onLogin: (user: {

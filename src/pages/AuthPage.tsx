@@ -17,7 +17,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "../components/ui/tabs";
-import { MessageSquare, Mail, Lock, User } from "lucide-react";
+import { MessageSquare, Mail, Lock, User, Loader2 } from "lucide-react";
 import { useUserStore } from "../store/userStore";
 import React from "react";
 import { login, signup } from "../utils/API";
@@ -32,10 +32,12 @@ export function AuthPage() {
   const [name, setName] = useState("");
   const [resetEmail, setResetEmail] = useState("");
   const [activeTab, setActiveTab] = useState("login");
-  const { user, setUser } = useUserStore((state) => state);
+  const [isLoading, setIsLoading] = useState(false);
+  const { setUser } = useUserStore((state) => state);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       const response = await login({ email, password });
       if (response.token) {
@@ -47,21 +49,27 @@ export function AuthPage() {
           email: response.user.email,
           role: response.user.is_admin ? "admin" : "user",
         });
+        toast.success("Login successful!", {
+          description: "Welcome back!",
+        });
         navigate("/chat");
       } else {
-        toast("Invalid credentials.", {
+        toast.error("Invalid credentials.", {
           description: "Please check your email and password.",
         });
       }
     } catch (error) {
-      toast("An unexpected error occurred.", {
+      toast.error("Login failed.", {
         description: (error as Error).message,
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       const keyPair = RSA();
       const b64_public_key = bigintToBase64(keyPair.n);
@@ -74,15 +82,20 @@ export function AuthPage() {
       });
       if (response) {
         localStorage.setItem("private_key", b64_private_key);
-        toast("Signup successful", {
+        toast.success("Signup successful!", {
           description: "You can now login to your account.",
         });
-        navigate("/login");
+        setActiveTab("login");
+        setEmail("");
+        setPassword("");
+        setName("");
       }
     } catch (error) {
-      toast("An unexpected error occurred.", {
+      toast.error("Signup failed.", {
         description: (error as Error).message,
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -93,34 +106,56 @@ export function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 mb-4">
+    <div className="min-h-screen w-full flex items-center justify-center bg-blue-50 p-4">
+      <div className="w-full max-w-md space-y-6">
+        <div className="text-center mb-8 animate-in fade-in slide-in-from-top-4 duration-500">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-600 mb-4 shadow-lg shadow-blue-500/25">
             <MessageSquare className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-gray-900 mb-2">SecureChat</h1>
-          <p className="text-gray-600">Connect with your team instantly</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">SecureChat</h1>
+          <p className="text-gray-600 text-sm">
+            Connect with your team instantly
+          </p>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="login">Login</TabsTrigger>
-            <TabsTrigger value="register">Register</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 bg-white/80 backdrop-blur-sm">
+            <TabsTrigger
+              value="login"
+              className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+            >
+              Login
+            </TabsTrigger>
+            <TabsTrigger
+              value="register"
+              className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+            >
+              Register
+            </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="login">
-            <Card>
-              <CardHeader>
-                <CardTitle>Welcome back</CardTitle>
-                <CardDescription>
+          <TabsContent
+            value="login"
+            className="animate-in fade-in slide-in-from-bottom-2 duration-300 mt-4"
+          >
+            <Card className="border-0 shadow-xl shadow-blue-500/10">
+              <CardHeader className="space-y-1 pb-4">
+                <CardTitle className="text-2xl font-semibold">
+                  Welcome back
+                </CardTitle>
+                <CardDescription className="text-sm">
                   Enter your credentials to access your account
                 </CardDescription>
               </CardHeader>
               <form onSubmit={handleLogin}>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="login-email">Email</Label>
+                    <Label
+                      htmlFor="login-email"
+                      className="text-sm font-medium"
+                    >
+                      Email
+                    </Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                       <Input
@@ -128,14 +163,22 @@ export function AuthPage() {
                         type="email"
                         placeholder="name@example.com"
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="pl-10"
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          setEmail(e.target.value)
+                        }
+                        className="pl-10 h-11 transition-all focus:ring-2 focus:ring-blue-500/20"
                         required
+                        disabled={isLoading}
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="login-password">Password</Label>
+                    <Label
+                      htmlFor="login-password"
+                      className="text-sm font-medium"
+                    >
+                      Password
+                    </Label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                       <Input
@@ -143,41 +186,68 @@ export function AuthPage() {
                         type="password"
                         placeholder="••••••••"
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="pl-10"
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          setPassword(e.target.value)
+                        }
+                        className="pl-10 h-11 transition-all focus:ring-2 focus:ring-blue-500/20"
                         required
+                        disabled={isLoading}
                       />
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab("reset")}
-                    className="text-sm text-blue-600 hover:text-blue-700"
-                  >
-                    Forgot password?
-                  </button>
+                  <div className="flex items-center justify-end">
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab("reset")}
+                      className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
+                      disabled={isLoading}
+                    >
+                      Forgot password?
+                    </button>
+                  </div>
                 </CardContent>
-                <CardFooter className="flex flex-col gap-2">
-                  <Button type="submit" className="w-full mt-4">
-                    Sign In
+                <CardFooter className="flex flex-col gap-2 pt-4">
+                  <Button
+                    type="submit"
+                    className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-lg shadow-blue-500/25 transition-all disabled:opacity-50"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Signing in...
+                      </>
+                    ) : (
+                      "Sign In"
+                    )}
                   </Button>
                 </CardFooter>
               </form>
             </Card>
           </TabsContent>
 
-          <TabsContent value="register">
-            <Card>
-              <CardHeader>
-                <CardTitle>Create an account</CardTitle>
-                <CardDescription>
+          <TabsContent
+            value="register"
+            className="animate-in fade-in slide-in-from-bottom-2 duration-300 mt-4"
+          >
+            <Card className="border-0 shadow-xl shadow-blue-500/10">
+              <CardHeader className="space-y-1 pb-4">
+                <CardTitle className="text-2xl font-semibold">
+                  Create an account
+                </CardTitle>
+                <CardDescription className="text-sm">
                   Enter your information to get started
                 </CardDescription>
               </CardHeader>
               <form onSubmit={handleRegister}>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="register-name">Full Name</Label>
+                    <Label
+                      htmlFor="register-name"
+                      className="text-sm font-medium"
+                    >
+                      Full Name
+                    </Label>
                     <div className="relative">
                       <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                       <Input
@@ -185,14 +255,22 @@ export function AuthPage() {
                         type="text"
                         placeholder="John Doe"
                         value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        className="pl-10"
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          setName(e.target.value)
+                        }
+                        className="pl-10 h-11 transition-all focus:ring-2 focus:ring-blue-500/20"
                         required
+                        disabled={isLoading}
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="register-email">Email</Label>
+                    <Label
+                      htmlFor="register-email"
+                      className="text-sm font-medium"
+                    >
+                      Email
+                    </Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                       <Input
@@ -200,14 +278,22 @@ export function AuthPage() {
                         type="email"
                         placeholder="name@example.com"
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="pl-10"
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          setEmail(e.target.value)
+                        }
+                        className="pl-10 h-11 transition-all focus:ring-2 focus:ring-blue-500/20"
                         required
+                        disabled={isLoading}
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="register-password">Password</Label>
+                    <Label
+                      htmlFor="register-password"
+                      className="text-sm font-medium"
+                    >
+                      Password
+                    </Label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                       <Input
@@ -215,34 +301,58 @@ export function AuthPage() {
                         type="password"
                         placeholder="••••••••"
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="pl-10"
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          setPassword(e.target.value)
+                        }
+                        className="pl-10 h-11 transition-all focus:ring-2 focus:ring-blue-500/20"
                         required
+                        disabled={isLoading}
                       />
                     </div>
                   </div>
                 </CardContent>
-                <CardFooter>
-                  <Button type="submit" className="w-full mt-4">
-                    Create Account
+                <CardFooter className="pt-4">
+                  <Button
+                    type="submit"
+                    className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-lg shadow-blue-500/25 transition-all disabled:opacity-50"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Creating account...
+                      </>
+                    ) : (
+                      "Create Account"
+                    )}
                   </Button>
                 </CardFooter>
               </form>
             </Card>
           </TabsContent>
 
-          <TabsContent value="reset">
-            <Card>
-              <CardHeader>
-                <CardTitle>Reset password</CardTitle>
-                <CardDescription>
+          <TabsContent
+            value="reset"
+            className="animate-in fade-in slide-in-from-bottom-2 duration-300"
+          >
+            <Card className="border-0 shadow-xl shadow-blue-500/10">
+              <CardHeader className="space-y-1 pb-4">
+                <CardTitle className="text-2xl font-semibold">
+                  Reset password
+                </CardTitle>
+                <CardDescription className="text-sm">
                   Enter your email to receive a reset link
                 </CardDescription>
               </CardHeader>
               <form onSubmit={handlePasswordReset}>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="reset-email">Email</Label>
+                    <Label
+                      htmlFor="reset-email"
+                      className="text-sm font-medium"
+                    >
+                      Email
+                    </Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                       <Input
@@ -250,21 +360,36 @@ export function AuthPage() {
                         type="email"
                         placeholder="name@example.com"
                         value={resetEmail}
-                        onChange={(e) => setResetEmail(e.target.value)}
-                        className="pl-10"
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          setResetEmail(e.target.value)
+                        }
+                        className="pl-10 h-11 transition-all focus:ring-2 focus:ring-blue-500/20"
                         required
+                        disabled={isLoading}
                       />
                     </div>
                   </div>
                 </CardContent>
-                <CardFooter className="flex flex-col gap-2">
-                  <Button type="submit" className="w-full">
-                    Send Reset Link
+                <CardFooter className="flex flex-col gap-2 pt-4">
+                  <Button
+                    type="submit"
+                    className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-lg shadow-blue-500/25 transition-all disabled:opacity-50"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      "Send Reset Link"
+                    )}
                   </Button>
                   <button
                     type="button"
                     onClick={() => setActiveTab("login")}
-                    className="text-sm text-gray-600 hover:text-gray-700"
+                    className="text-sm text-gray-600 hover:text-gray-700 font-medium transition-colors mt-2"
+                    disabled={isLoading}
                   >
                     Back to login
                   </button>

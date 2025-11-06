@@ -1,11 +1,11 @@
-import { useState } from 'react';
-import { ConversationList } from './ConversationList';
-import { ChatWindow } from './ChatWindow';
-import { UserProfile } from './UserProfile';
-import { SettingsPanel } from './SettingsPanel';
+import { useState } from "react";
+import { ConversationList } from "./ConversationList";
+import { ChatWindow } from "./ChatWindow";
+import { UserProfile } from "./UserProfile";
+import { SettingsPanel } from "./SettingsPanel";
 
 interface ChatInterfaceProps {
-  user: { id: string; name: string; email: string; role: 'user' | 'admin' };
+  user: { id: string; name: string; email: string; role: "user" | "admin" };
   onLogout: () => void;
   onSwitchToAdmin?: () => void;
 }
@@ -32,116 +32,127 @@ export interface Message {
 
 const mockConversations: Conversation[] = [
   {
-    id: '1',
-    name: 'Sarah Johnson',
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150',
-    lastMessage: 'Hey! How are you doing?',
-    timestamp: '2m ago',
+    id: "1",
+    name: "Sarah Johnson",
+    avatar:
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150",
+    lastMessage: "Hey! How are you doing?",
+    timestamp: "2m ago",
     unread: 2,
     isGroup: false,
-    isOnline: true
+    isOnline: true,
   },
   {
-    id: '2',
-    name: 'Design Team',
-    avatar: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=150',
-    lastMessage: 'The new mockups look great!',
-    timestamp: '15m ago',
+    id: "2",
+    name: "Design Team",
+    avatar:
+      "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=150",
+    lastMessage: "The new mockups look great!",
+    timestamp: "15m ago",
     unread: 5,
     isGroup: true,
-    isOnline: false
+    isOnline: false,
   },
   {
-    id: '3',
-    name: 'Michael Chen',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
-    lastMessage: 'Can we schedule a meeting?',
-    timestamp: '1h ago',
+    id: "3",
+    name: "Michael Chen",
+    avatar:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
+    lastMessage: "Can we schedule a meeting?",
+    timestamp: "1h ago",
     unread: 0,
     isGroup: false,
-    isOnline: false
+    isOnline: false,
   },
   {
-    id: '4',
-    name: 'Marketing Team',
-    avatar: 'https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?w=150',
-    lastMessage: 'Campaign results are in!',
-    timestamp: '2h ago',
+    id: "4",
+    name: "Marketing Team",
+    avatar:
+      "https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?w=150",
+    lastMessage: "Campaign results are in!",
+    timestamp: "2h ago",
     unread: 1,
     isGroup: true,
-    isOnline: false
+    isOnline: false,
   },
   {
-    id: '5',
-    name: 'Emma Wilson',
-    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150',
-    lastMessage: 'Thanks for your help!',
-    timestamp: '1d ago',
+    id: "5",
+    name: "Emma Wilson",
+    avatar:
+      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150",
+    lastMessage: "Thanks for your help!",
+    timestamp: "1d ago",
     unread: 0,
     isGroup: false,
-    isOnline: true
-  }
+    isOnline: true,
+  },
 ];
 
 const mockMessages: Record<string, Message[]> = {
-  '1': [
+  "1": [
     {
-      id: '1',
-      senderId: '1',
-      senderName: 'Sarah Johnson',
-      content: 'Hey! How are you doing?',
-      timestamp: '10:30 AM',
-      isOwn: false
+      id: "1",
+      senderId: "1",
+      senderName: "Sarah Johnson",
+      content: "Hey! How are you doing?",
+      timestamp: "10:30 AM",
+      isOwn: false,
     },
     {
-      id: '2',
-      senderId: 'me',
-      senderName: 'Me',
-      content: 'Hi Sarah! I\'m doing great, thanks for asking!',
-      timestamp: '10:32 AM',
-      isOwn: true
+      id: "2",
+      senderId: "me",
+      senderName: "Me",
+      content: "Hi Sarah! I'm doing great, thanks for asking!",
+      timestamp: "10:32 AM",
+      isOwn: true,
     },
     {
-      id: '3',
-      senderId: '1',
-      senderName: 'Sarah Johnson',
-      content: 'That\'s wonderful! Are you free for a quick call later?',
-      timestamp: '10:33 AM',
-      isOwn: false
-    }
+      id: "3",
+      senderId: "1",
+      senderName: "Sarah Johnson",
+      content: "That's wonderful! Are you free for a quick call later?",
+      timestamp: "10:33 AM",
+      isOwn: false,
+    },
   ],
-  '2': [
+  "2": [
     {
-      id: '1',
-      senderId: '2',
-      senderName: 'Alex',
-      content: 'The new mockups look great!',
-      timestamp: '9:15 AM',
-      isOwn: false
+      id: "1",
+      senderId: "2",
+      senderName: "Alex",
+      content: "The new mockups look great!",
+      timestamp: "9:15 AM",
+      isOwn: false,
     },
     {
-      id: '2',
-      senderId: '3',
-      senderName: 'Jessica',
-      content: 'I agree! The color scheme is perfect.',
-      timestamp: '9:20 AM',
-      isOwn: false
+      id: "2",
+      senderId: "3",
+      senderName: "Jessica",
+      content: "I agree! The color scheme is perfect.",
+      timestamp: "9:20 AM",
+      isOwn: false,
     },
     {
-      id: '3',
-      senderId: 'me',
-      senderName: 'Me',
-      content: 'Thanks everyone! Glad you like them.',
-      timestamp: '9:25 AM',
-      isOwn: true
-    }
-  ]
+      id: "3",
+      senderId: "me",
+      senderName: "Me",
+      content: "Thanks everyone! Glad you like them.",
+      timestamp: "9:25 AM",
+      isOwn: true,
+    },
+  ],
 };
 
-export function ChatInterface({ user, onLogout, onSwitchToAdmin }: ChatInterfaceProps) {
-  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(mockConversations[0]);
+export function ChatInterface({
+  user,
+  onLogout,
+  onSwitchToAdmin,
+}: ChatInterfaceProps) {
+  const [selectedConversation, setSelectedConversation] =
+    useState<Conversation | null>(mockConversations[0]);
   const [conversations] = useState<Conversation[]>(mockConversations);
-  const [messages, setMessages] = useState<Record<string, Message[]>>(mockMessages);
+  const [messages, setMessages] =
+    useState<Record<string, Message[]>>(mockMessages);
   const [showProfile, setShowProfile] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
@@ -150,16 +161,22 @@ export function ChatInterface({ user, onLogout, onSwitchToAdmin }: ChatInterface
 
     const newMessage: Message = {
       id: Date.now().toString(),
-      senderId: 'me',
-      senderName: 'Me',
+      senderId: "me",
+      senderName: "Me",
       content,
-      timestamp: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
-      isOwn: true
+      timestamp: new Date().toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+      }),
+      isOwn: true,
     };
 
-    setMessages(prev => ({
+    setMessages((prev) => ({
       ...prev,
-      [selectedConversation.id]: [...(prev[selectedConversation.id] || []), newMessage]
+      [selectedConversation.id]: [
+        ...(prev[selectedConversation.id] || []),
+        newMessage,
+      ],
     }));
   };
 

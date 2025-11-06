@@ -49,7 +49,6 @@ import {
   TableRow,
 } from "../components/ui/table";
 import { useUserStore } from "../store/userStore";
-import React from "react";
 
 const mockUsers = [
   {
@@ -299,7 +298,9 @@ export function AdminPage() {
                     <Input
                       placeholder="Search users..."
                       value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setSearchQuery(e.target.value)
+                      }
                       className="pl-10"
                     />
                   </div>

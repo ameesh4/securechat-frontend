@@ -1,23 +1,25 @@
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { X, Camera, Save } from 'lucide-react';
-import { useState } from 'react';
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { X, Camera, Save } from "lucide-react";
+import { useState } from "react";
 
 interface UserProfileProps {
-  user: { id: string; name: string; email: string; role: 'user' | 'admin' };
+  user: { id: string; name: string; email: string; role: "user" | "admin" };
   onClose: () => void;
 }
 
 export function UserProfile({ user, onClose }: UserProfileProps) {
   const [name, setName] = useState(user.name);
   const [email, setEmail] = useState(user.email);
-  const [bio, setBio] = useState('Software developer passionate about creating great user experiences.');
+  const [bio, setBio] = useState(
+    "Software developer passionate about creating great user experiences."
+  );
 
   const handleSave = () => {
     // Mock save - in real app, this would update the user profile
-    alert('Profile updated successfully!');
+    alert("Profile updated successfully!");
     onClose();
   };
 

@@ -5,8 +5,8 @@ import { ChatWindow } from "../components/ChatWindow";
 import { UserProfile } from "../components/UserProfile";
 import { SettingsPanel } from "../components/SettingsPanel";
 import { useUserStore } from "../store/userStore";
-import React from "react";
-import { getSocket, initSocket } from "../utils/Socket";
+import { getSocket } from "../utils/Socket";
+import { MessageSquare } from "lucide-react";
 
 export interface Conversation {
   id: string;
@@ -204,7 +204,7 @@ export function ChatPage() {
   return (
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar with conversations */}
-      <div className="w-80 border-r border-gray-200 bg-white flex flex-col">
+      <div className="w-80 border-r border-gray-200/80 bg-white/90 backdrop-blur-sm flex flex-col shadow-lg shadow-gray-900/5">
         <ConversationList
           conversations={conversations}
           selectedConversation={selectedConversation}
@@ -228,8 +228,20 @@ export function ChatPage() {
             onSendMessage={handleSendMessage}
           />
         ) : (
-          <div className="flex-1 flex items-center justify-center text-gray-500">
-            Select a conversation to start chatting
+          <div className="flex-1 flex flex-col items-center justify-center text-gray-500 bg-white">
+            <div className="text-center space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="w-20 h-20 mx-auto rounded-full bg-blue-100 flex items-center justify-center">
+                <MessageSquare className="w-10 h-10 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-lg font-medium text-gray-700">
+                  Select a conversation
+                </p>
+                <p className="text-sm text-gray-500 mt-1">
+                  Choose a chat from the sidebar to start messaging
+                </p>
+              </div>
+            </div>
           </div>
         )}
       </div>

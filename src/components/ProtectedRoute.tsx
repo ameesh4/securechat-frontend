@@ -1,7 +1,6 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
-import { useUserStore } from "../store/userStore";
-import React from "react";
+import { useUserStore } from "../../../securechat/src/store/userStore";
 
 interface ProtectedRouteProps {
   children: ReactNode;

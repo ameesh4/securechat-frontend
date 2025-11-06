@@ -1,11 +1,11 @@
-import {
+import type {
   LoginData,
   LoginResponse,
   SignupData,
   SignupResponse,
   User,
 } from "../types/User";
-import { IResponse } from "./axiosInstance";
+import type { IResponse } from "./axiosInstance";
 import { fetcher, postRequest } from "./APIHelper";
 
 export const signup = async (data: SignupData) => {

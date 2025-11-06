@@ -26,10 +26,6 @@ export const initSocket = (): Socket => {
     socket.on("connect_error", (err) => {
       console.error("Socket connection error:", err.message);
     });
-
-    if (socket.connected) {
-      console.log("Connected to SecureChat Socket");
-    }
     console.log("Socket connection state:", socket.connected);
   }
 

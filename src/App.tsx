@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -6,13 +6,13 @@ import {
   Navigate,
   useNavigate,
 } from "react-router-dom";
-import { AuthPage } from "./pages/AuthPage";
-import { ChatPage } from "./pages/ChatPage";
-import { AdminPage } from "./pages/AdminPage";
+import { AuthPage } from "../../securechat/src/pages/AuthPage";
+import { ChatPage } from "../../securechat/src/pages/ChatPage";
+import { AdminPage } from "../../securechat/src/pages/AdminPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import { useUserStore } from "./store/userStore";
-import { validateToken } from "./utils/API";
-import { initSocket } from "./utils/Socket";
+import { useUserStore } from "../../securechat/src/store/userStore";
+import { validateToken } from "../../securechat/src/utils/API";
+import { initSocket } from "../../securechat/src/utils/Socket";
 
 function AppRoutes() {
   const user = useUserStore((state) => state.user);
