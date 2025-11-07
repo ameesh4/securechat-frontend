@@ -25,7 +25,7 @@ export default function NewChatPanel({
             <Button variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit">Create Chat</Button>
+            <Button variant="outline" type="submit">Create Chat</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

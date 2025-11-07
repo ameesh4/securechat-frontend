@@ -67,29 +67,7 @@ export function ChatWindow({
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-9 w-9 rounded-full hover:bg-gray-100"
-            >
-              <Phone className="w-4 h-4 text-gray-600" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-9 w-9 rounded-full hover:bg-gray-100"
-            >
-              <Video className="w-4 h-4 text-gray-600" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-9 w-9 rounded-full hover:bg-gray-100"
-            >
-              <MoreVertical className="w-4 h-4 text-gray-600" />
-            </Button>
-          </div>
+          
         </div>
       </div>
 
@@ -181,7 +159,7 @@ export function ChatWindow({
       <div className="px-6 py-4 border-t border-gray-200 bg-white shadow-lg">
         <form
           onSubmit={handleSend}
-          className="flex items-end gap-3 max-w-4xl mx-auto"
+          className="flex items-center gap-3 max-w-4xl mx-auto"
         >
           <div className="flex-1 bg-gray-50 rounded-2xl px-5 py-3 flex items-center gap-2 border border-gray-200 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:bg-white transition-all shadow-sm">
             <Input
@@ -194,7 +172,7 @@ export function ChatWindow({
           <Button
             type="submit"
             size="icon"
-            className="rounded-full h-11 w-11 bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-blue-600"
+            className="rounded-full h-11 w-11 bg-blue-600 hover:bg-blue-700 text-black shadow-md hover:shadow-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-blue-600"
             disabled={!messageInput.trim()}
           >
             <Send className="w-5 h-5" />

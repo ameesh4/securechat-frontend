@@ -68,7 +68,7 @@ export function ConversationList({
       {/* New Chat Button */}
       <div className="p-4 border-b border-gray-200 bg-white/80 backdrop-blur-sm">
         <Button
-          className="w-full h-10 bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-md shadow-blue-500/20 transition-all"
+          className="w-full h-10 bg-blue-600 hover:bg-blue-700 text-black font-medium shadow-md shadow-blue-500/20 transition-all"
           onClick={() => setNewChatOpen(true)}
         >
           <Plus className="w-4 h-4 mr-2" />

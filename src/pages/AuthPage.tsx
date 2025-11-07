@@ -122,13 +122,13 @@ export function AuthPage() {
           <TabsList className="grid w-full grid-cols-2 bg-white/80 backdrop-blur-sm">
             <TabsTrigger
               value="login"
-              className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+              className="data-[state=active]:bg-blue-600"
             >
               Login
             </TabsTrigger>
             <TabsTrigger
               value="register"
-              className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+              className="data-[state=active]:bg-blue-600"
             >
               Register
             </TabsTrigger>
@@ -209,7 +209,7 @@ export function AuthPage() {
                 <CardFooter className="flex flex-col gap-2 pt-4">
                   <Button
                     type="submit"
-                    className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-lg shadow-blue-500/25 transition-all disabled:opacity-50"
+                    className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-black font-medium shadow-lg shadow-blue-500/25 transition-all disabled:opacity-50"
                     disabled={isLoading}
                   >
                     {isLoading ? (
@@ -314,7 +314,7 @@ export function AuthPage() {
                 <CardFooter className="pt-4">
                   <Button
                     type="submit"
-                    className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-lg shadow-blue-500/25 transition-all disabled:opacity-50"
+                    className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-black font-medium shadow-lg shadow-blue-500/25 transition-all disabled:opacity-50"
                     disabled={isLoading}
                   >
                     {isLoading ? (
@@ -373,7 +373,7 @@ export function AuthPage() {
                 <CardFooter className="flex flex-col gap-2 pt-4">
                   <Button
                     type="submit"
-                    className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-lg shadow-blue-500/25 transition-all disabled:opacity-50"
+                    className="w-full h-11 bg-blue-600 hover:bg-blue-700 font-medium shadow-lg shadow-blue-500/25 transition-all disabled:opacity-50"
                     disabled={isLoading}
                   >
                     {isLoading ? (
