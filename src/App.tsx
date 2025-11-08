@@ -12,7 +12,7 @@ import { AdminPage } from "./pages/AdminPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { useUserStore } from "./store/userStore";
 import { validateToken } from "./utils/API";
-import { initSocket } from "./utils/Socket";
+
 
 function AppRoutes() {
   const user = useUserStore((state) => state.user);
@@ -42,6 +42,21 @@ function AppRoutes() {
   useEffect(() => {
     authenticateUser();
   }, []);
+
+  useEffect(() => {
+
+    const func = async () => {
+
+      // await main();
+
+    }
+
+    func();
+
+  }, [])
+
+
+
 
   return (
     <Routes>
