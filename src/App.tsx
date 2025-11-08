@@ -47,6 +47,21 @@ function AppRoutes() {
     authenticateUser();
   }, []);
 
+  useEffect(() => {
+
+    const func = async () => {
+
+      // await main();
+
+    }
+
+    func();
+
+  }, [])
+
+
+
+
   return (
     <Routes>
       <Route

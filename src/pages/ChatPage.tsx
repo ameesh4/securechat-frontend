@@ -7,7 +7,7 @@ import { SettingsPanel } from "../components/SettingsPanel";
 import { useUserStore } from "../store/userStore";
 import { getSocket, sock_emit } from "../utils/Socket";
 import { MessageSquare } from "lucide-react";
-import { io } from "socket.io-client";
+
 
 export interface Conversation {
   id: string;
@@ -18,6 +18,9 @@ export interface Conversation {
   unread: number;
   isGroup: boolean;
   isOnline?: boolean;
+  aes_key: {
+    key: CryptoKey
+  }
 }
 
 export interface Message {
@@ -29,63 +32,6 @@ export interface Message {
   isOwn: boolean;
 }
 
-const mockConversations: Conversation[] = [
-  {
-    id: "1",
-    name: "Sarah Johnson",
-    avatar:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150",
-    lastMessage: "Hey! How are you doing?",
-    timestamp: "2m ago",
-    unread: 2,
-    isGroup: false,
-    isOnline: true,
-  },
-  {
-    id: "2",
-    name: "Design Team",
-    avatar:
-      "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=150",
-    lastMessage: "The new mockups look great!",
-    timestamp: "15m ago",
-    unread: 5,
-    isGroup: true,
-    isOnline: false,
-  },
-  {
-    id: "3",
-    name: "Michael Chen",
-    avatar:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
-    lastMessage: "Can we schedule a meeting?",
-    timestamp: "1h ago",
-    unread: 0,
-    isGroup: false,
-    isOnline: false,
-  },
-  {
-    id: "4",
-    name: "Marketing Team",
-    avatar:
-      "https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?w=150",
-    lastMessage: "Campaign results are in!",
-    timestamp: "2h ago",
-    unread: 1,
-    isGroup: true,
-    isOnline: false,
-  },
-  {
-    id: "5",
-    name: "Emma Wilson",
-    avatar:
-      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150",
-    lastMessage: "Thanks for your help!",
-    timestamp: "1d ago",
-    unread: 0,
-    isGroup: false,
-    isOnline: true,
-  },
-];
 
 const mockMessages: Record<string, Message[]> = {
   "1": [
@@ -151,14 +97,16 @@ export function ChatPage() {
   const switchToAdmin = useUserStore((state) => state.switchToAdmin);
 
   const [selectedConversation, setSelectedConversation] =
-    useState<Conversation | null>(mockConversations[0]);
-  const [conversations] = useState<Conversation[]>(mockConversations);
+    useState<Conversation | null>(null);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
   const [messages, setMessages] =
     useState<Record<string, Message[]>>(mockMessages);
   const [showProfile, setShowProfile] = useState(false);
   // const [showSettings, setShowSettings] = useState(false);
 
   const [authSockLoading, setAuthSockLoading] = useState(true);
+
+  
 
   const handleLogout = () => {
     logout();
@@ -230,6 +178,9 @@ export function ChatPage() {
           conversations={conversations}
           selectedConversation={selectedConversation}
           onSelectConversation={setSelectedConversation}
+          addConversation={(conversation)=>{
+            setConversations((prev)=>[...prev, conversation])
+          }}
           user={user}
           onLogout={handleLogout}
           onSwitchToAdmin={
