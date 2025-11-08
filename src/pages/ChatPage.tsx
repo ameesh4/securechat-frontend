@@ -1,94 +1,34 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ConversationList } from "../components/ConversationList";
 import { ChatWindow } from "../components/ChatWindow";
 import { UserProfile } from "../components/UserProfile";
-import { SettingsPanel } from "../components/SettingsPanel";
 import { useUserStore } from "../store/userStore";
 import { getSocket, sock_emit } from "../utils/Socket";
 import { MessageSquare } from "lucide-react";
+import type { Conversation, Message } from "@/components/ChatInterface";
+import { decryptAESKey, type GoChatSession, type GoUser } from "@/components/NewChatPanel";
+import { AESDecrypt, AESEncrypt, base64ToBigint, base64ToUint8Array, uint8ArrayToBase64 } from "@/utils/AES";
+import type { Socket } from "socket.io-client";
 
 
-export interface Conversation {
-  id: string;
-  name: string;
-  avatar?: string;
-  lastMessage: string;
-  timestamp: string;
-  unread: number;
-  isGroup: boolean;
-  isOnline?: boolean;
-  aes_key: {
-    key: CryptoKey
-  }
-}
-
-export interface Message {
-  id: string;
-  senderId: string;
-  senderName: string;
+export type GoChatMessage = {
+  id: number;
+  sender_id: number;
+  receiver_id: number;
+  session_id: number;
   content: string;
-  timestamp: string;
-  isOwn: boolean;
+  iv: string;
+
+  is_read: boolean;
+  created_at: string;
+  updated_at: string;
+
+  Sender: GoUser;
+  Receiver: GoUser;
 }
 
 
-const mockMessages: Record<string, Message[]> = {
-  "1": [
-    {
-      id: "1",
-      senderId: "1",
-      senderName: "Sarah Johnson",
-      content: "Hey! How are you doing?",
-      timestamp: "10:30 AM",
-      isOwn: false,
-    },
-    {
-      id: "2",
-      senderId: "me",
-      senderName: "Me",
-      content: "Hi Sarah! I'm doing great, thanks for asking!",
-      timestamp: "10:32 AM",
-      isOwn: true,
-    },
-    {
-      id: "3",
-      senderId: "1",
-      senderName: "Sarah Johnson",
-      content: "That's wonderful! Are you free for a quick call later?",
-      timestamp: "10:33 AM",
-      isOwn: false,
-    },
-  ],
-  "2": [
-    {
-      id: "1",
-      senderId: "2",
-      senderName: "Alex",
-      content: "The new mockups look great!",
-      timestamp: "9:15 AM",
-      isOwn: false,
-    },
-    {
-      id: "2",
-      senderId: "3",
-      senderName: "Jessica",
-      content: "I agree! The color scheme is perfect.",
-      timestamp: "9:20 AM",
-      isOwn: false,
-    },
-    {
-      id: "3",
-      senderId: "me",
-      senderName: "Me",
-      content: "Thanks everyone! Glad you like them.",
-      timestamp: "9:25 AM",
-      isOwn: true,
-    },
-  ],
-};
-
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || "http://localhost:8080";
 
 export function ChatPage() {
   const navigate = useNavigate();
@@ -100,13 +40,12 @@ export function ChatPage() {
     useState<Conversation | null>(null);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [messages, setMessages] =
-    useState<Record<string, Message[]>>(mockMessages);
+    useState<Record<string, Message[]>>({});
   const [showProfile, setShowProfile] = useState(false);
-  // const [showSettings, setShowSettings] = useState(false);
 
   const [authSockLoading, setAuthSockLoading] = useState(true);
+  const socketRef = useRef<Socket | null>(null);
 
-  
 
   const handleLogout = () => {
     logout();
@@ -122,12 +61,82 @@ export function ChatPage() {
     setAuthSockLoading(false);
   }, [setAuthSockLoading]);
 
-  useEffect(() => {
-    const socket = getSocket();
+  const sockAuthFailHandler = useCallback(async (msg: string) => {
+    setAuthSockLoading(false);
 
-    const token =
-      sessionStorage.getItem("token") || localStorage.getItem("token");
-    sock_emit(socket, "auth", { token });
+    sessionStorage.removeItem("token");
+    localStorage.removeItem("token");
+
+    logout();
+
+    window.location.href = "/";
+  }, [setAuthSockLoading]);
+
+  const newSessionHandler = useCallback(async (session: GoChatSession) => {
+    if (conversations.find((c) => c.id === session.id)) {
+      return;
+    }
+    const a1 = session.a1;
+    const aes_key = await decryptAESKey(a1);
+    const newConversation: Conversation = {
+      id: session.id,
+      user_id: session.User2.id,
+      name: session.User2.name,
+      lastMessage: "",
+      timestamp: new Date().toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+      }),
+      unread: 0,
+      isGroup: false,
+      aes_key: {
+        key: aes_key
+      },
+    };
+    setConversations((prev) => [...prev, newConversation]);
+  }, [conversations, setConversations]);
+
+  const sockMsgHandler = useCallback(async (msg: GoChatMessage) => {
+    console.log("Received message:", msg);
+
+    const sender_id = msg.sender_id;
+    const conversation = conversations.find((c) => c.user_id == sender_id);
+
+    if (!conversation) {
+      console.warn("Conversation not found for sender_id:", sender_id);
+      console.log("Existing conversations:", conversations);
+      return;
+    }
+    const aes_key = conversation.aes_key.key;
+
+    const encryptedContent = base64ToUint8Array(msg.content);
+    const iv = base64ToUint8Array(msg.iv);
+
+    const decryptedContent = await AESDecrypt(encryptedContent, aes_key, iv)
+    const newMessage: Message = {
+      id: msg.id.toString(),
+      senderId: msg.sender_id.toString(),
+      content: decryptedContent.decrypted,
+      timestamp: new Date().toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+      }),
+      isOwn: false,
+    };
+
+    setMessages((prev) => ({
+      ...prev,
+      [conversation.id]: [
+        ...(prev[conversation.id] || []),
+        newMessage,
+      ],
+    }));
+  }, [conversations, setMessages, messages]);
+
+
+  useEffect(() => {
+    const socket = socketRef.current;
+    if (!socket) return;
     socket.on("auth_success", sockAuthSuccessHandler);
 
     return () => {
@@ -135,15 +144,77 @@ export function ChatPage() {
         socket.off("auth_success", sockAuthSuccessHandler);
       }
     };
+  }, [sockAuthSuccessHandler])
+
+  useEffect(() => {
+    const socket = socketRef.current;
+    if (!socket) return;
+    socket.on("auth_error", sockAuthFailHandler);
+
+    return () => {
+      if (socket) {
+        socket.off("auth_error", sockAuthFailHandler);
+      }
+    };
+  }, [sockAuthFailHandler])
+
+  useEffect(() => {
+    const socket = socketRef.current;
+    if (!socket) return;
+    socket.on("new_chat_session", newSessionHandler);
+
+    return () => {
+      if (socket) {
+        socket.off("new_chat_session", newSessionHandler);
+      }
+    };
+  }, [newSessionHandler])
+
+  useEffect(() => {
+    const socket = socketRef.current;
+    if (!socket) return;
+    socket.on("new_message", sockMsgHandler);
+
+    return () => {
+      if (socket) {
+        socket.off("new_message", sockMsgHandler);
+      }
+    };
+  }, [sockMsgHandler])
+
+  useEffect(() => {
+    const socket = getSocket();
+    socketRef.current = socket;
+    const token =
+      sessionStorage.getItem("token") || localStorage.getItem("token");
+    sock_emit(socket, "auth", { token });
   }, []);
 
-  const handleSendMessage = (content: string) => {
+  const handleSendMessage = async (content: string) => {
     if (!selectedConversation) return;
+
+    const aes_key = selectedConversation.aes_key.key;
+
+    // const encryptedMessage = 
+
+    const encryptedMessage = await AESEncrypt(content, aes_key);
+
+    const msg_b64 = uint8ArrayToBase64(encryptedMessage.encrypted);
+    const iv_b64 = uint8ArrayToBase64(encryptedMessage.iv);
+
+    const socket = socketRef.current!;
+
+    sock_emit(socket, "send_message", {
+      sender_id: user!.id,
+      receiver_id: selectedConversation.user_id,
+      session_id: selectedConversation.id,
+      content: msg_b64,
+      iv: iv_b64,
+    })
 
     const newMessage: Message = {
       id: Date.now().toString(),
-      senderId: "me",
-      senderName: "Me",
+      senderId: user!.id,
       content,
       timestamp: new Date().toLocaleTimeString("en-US", {
         hour: "numeric",
@@ -178,8 +249,8 @@ export function ChatPage() {
           conversations={conversations}
           selectedConversation={selectedConversation}
           onSelectConversation={setSelectedConversation}
-          addConversation={(conversation)=>{
-            setConversations((prev)=>[...prev, conversation])
+          addConversation={(conversation) => {
+            setConversations((prev) => [...prev, conversation])
           }}
           user={user}
           onLogout={handleLogout}
@@ -187,7 +258,7 @@ export function ChatPage() {
             user.role === "admin" ? handleSwitchToAdmin : undefined
           }
           onShowProfile={() => setShowProfile(true)}
-          // onShowSettings={() => setShowSettings(true)}
+        // onShowSettings={() => setShowSettings(true)}
         />
       </div>
 

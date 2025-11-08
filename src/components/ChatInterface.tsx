@@ -3,7 +3,6 @@ import { ConversationList } from "./ConversationList";
 import { ChatWindow } from "./ChatWindow";
 import { UserProfile } from "./UserProfile";
 import { SettingsPanel } from "./SettingsPanel";
-import type { AESKeyResult } from "@/utils/AES";
 
 interface ChatInterfaceProps {
   user: { id: string; name: string; email: string; role: "user" | "admin" };
@@ -12,7 +11,8 @@ interface ChatInterfaceProps {
 }
 
 export interface Conversation {
-  id: string;
+  id: number;
+  user_id: number;
   name: string;
   avatar?: string;
   lastMessage: string;
@@ -20,73 +20,19 @@ export interface Conversation {
   unread: number;
   isGroup: boolean;
   isOnline?: boolean;
-  aes_key: AESKeyResult;
+  aes_key: {
+    key: CryptoKey
+  } ;
 }
 
 export interface Message {
   id: string;
   senderId: string;
-  senderName: string;
   content: string;
   timestamp: string;
   isOwn: boolean;
 }
 
-
-const mockMessages: Record<string, Message[]> = {
-  "1": [
-    {
-      id: "1",
-      senderId: "1",
-      senderName: "Sarah Johnson",
-      content: "Hey! How are you doing?",
-      timestamp: "10:30 AM",
-      isOwn: false,
-    },
-    {
-      id: "2",
-      senderId: "me",
-      senderName: "Me",
-      content: "Hi Sarah! I'm doing great, thanks for asking!",
-      timestamp: "10:32 AM",
-      isOwn: true,
-    },
-    {
-      id: "3",
-      senderId: "1",
-      senderName: "Sarah Johnson",
-      content: "That's wonderful! Are you free for a quick call later?",
-      timestamp: "10:33 AM",
-      isOwn: false,
-    },
-  ],
-  "2": [
-    {
-      id: "1",
-      senderId: "2",
-      senderName: "Alex",
-      content: "The new mockups look great!",
-      timestamp: "9:15 AM",
-      isOwn: false,
-    },
-    {
-      id: "2",
-      senderId: "3",
-      senderName: "Jessica",
-      content: "I agree! The color scheme is perfect.",
-      timestamp: "9:20 AM",
-      isOwn: false,
-    },
-    {
-      id: "3",
-      senderId: "me",
-      senderName: "Me",
-      content: "Thanks everyone! Glad you like them.",
-      timestamp: "9:25 AM",
-      isOwn: true,
-    },
-  ],
-};
 
 export function ChatInterface({
   user,
@@ -97,7 +43,7 @@ export function ChatInterface({
     useState<Conversation | null>(null);
   const [conversations,setConversations] = useState<Conversation[]>([]);
   const [messages, setMessages] =
-    useState<Record<string, Message[]>>(mockMessages);
+    useState<Record<string, Message[]>>({});
   const [showProfile, setShowProfile] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
@@ -107,7 +53,6 @@ export function ChatInterface({
     const newMessage: Message = {
       id: Date.now().toString(),
       senderId: "me",
-      senderName: "Me",
       content,
       timestamp: new Date().toLocaleTimeString("en-US", {
         hour: "numeric",

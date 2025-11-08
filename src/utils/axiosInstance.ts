@@ -28,8 +28,8 @@ axiosInstance.interceptors.response.use(
   (response) => {
     // Check if the response contains a new access token in the Authorization header
     const newToken = response.headers.authorization;
-    if (newToken && newToken.startsWith("Bearer ")) {
-      const token = newToken.substring(7); // Remove 'Bearer ' prefix
+    if (newToken) {
+      const token = newToken;
       sessionStorage.setItem("token", token);
       setAccessToken(token);
     }

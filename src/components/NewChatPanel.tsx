@@ -19,7 +19,7 @@ type ChatSessionRequestResponse = {
   user2_public_key: string;
 }
 
-type GoUser = {
+export type GoUser = {
   id: number;
   name: string;
   email: string;
@@ -31,7 +31,7 @@ type GoUser = {
   updated_at: string;
 }
 
-type GoChatSession = {
+export type GoChatSession = {
   id: number;
   participant1: string;
   participant2: string;
@@ -45,6 +45,27 @@ type GoChatSession = {
   User2: GoUser;
 }
 
+
+export async function decryptAESKey(encB64aes: string){
+  const my_private_key_base_64 = sessionStorage.getItem("private_key") || localStorage.getItem("private_key");
+  if (!my_private_key_base_64) {
+    throw new Error("FATAL ERROR: Private key not found");
+  }
+  const my_public_key_base_64 = sessionStorage.getItem("public_key") || localStorage.getItem("public_key");
+  if (!my_public_key_base_64) {
+    throw new Error("FATAL ERROR: Public key not found");
+  }
+  
+  const my_private_key = base64ToBigint(my_private_key_base_64);
+  const my_public_key = base64ToBigint(my_public_key_base_64);
+  const aes_key_enc = base64ToBigint(encB64aes);
+
+  const my_exported_aes_key =  RSADecrypt(aes_key_enc, {
+    n: my_public_key,
+    d: my_private_key,
+  });
+  return await ImportAESKey(my_exported_aes_key);
+}
 
 
 export default function NewChatPanel({
@@ -113,25 +134,11 @@ export default function NewChatPanel({
     const chat_session =  res_create.data.data;
 
 
-    const my_server_aes_key_encrypted_base_64 = chat_session.a1;
-    const my_server_aes_key_encrypted = base64ToBigint(my_server_aes_key_encrypted_base_64);
-
-    const my_private_key_base_64 = sessionStorage.getItem("private_key") || localStorage.getItem("private_key");
-    if (!my_private_key_base_64) {
-      setLoading(false);
-      alert("FATAL ERROR: Private key not found");
-      return;
-    }
-    
-    const my_private_key = base64ToBigint(my_private_key_base_64);
-    const my_exported_aes_key =  RSADecrypt(my_server_aes_key_encrypted, {
-      n: my_public_key,
-      d: my_private_key,
-    });
-    const aes_key = await ImportAESKey(my_exported_aes_key);
+    const aes_key = await decryptAESKey(chat_session.a1);
 
     const newConversation: Conversation = {
-      id: chat_session.id.toString(),
+      id: chat_session.id,
+      user_id: chat_session.User2.id,
       name: chat_session.User2.name,
       lastMessage: "",
       timestamp: new Date().toLocaleTimeString("en-US", {
