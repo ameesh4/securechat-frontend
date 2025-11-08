@@ -26,6 +26,7 @@ interface ConversationListProps {
   conversations: Conversation[];
   selectedConversation: Conversation | null;
   onSelectConversation: (conversation: Conversation) => void;
+  addConversation: (conversation: Conversation) => void;
   user: { id: string; name: string; email: string; role: "user" | "admin" };
   onLogout: () => void;
   onSwitchToAdmin?: () => void;
@@ -37,6 +38,7 @@ export function ConversationList({
   conversations,
   selectedConversation,
   onSelectConversation,
+  addConversation,
   user,
   onLogout,
   onSwitchToAdmin,
@@ -226,7 +228,7 @@ export function ConversationList({
         </div>
 
         <div className="absolute bottom-0 left-0 right-0 top-0">
-          <NewChatPanel open={newChatOpen} onOpenChange={setNewChatOpen} />
+          <NewChatPanel addConversation={addConversation} open={newChatOpen} onOpenChange={setNewChatOpen} />
         </div>
       </div>
     </>
