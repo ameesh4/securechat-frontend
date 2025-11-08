@@ -192,7 +192,7 @@ export function ChatInterface({
           onLogout={onLogout}
           onSwitchToAdmin={onSwitchToAdmin}
           onShowProfile={() => setShowProfile(true)}
-          onShowSettings={() => setShowSettings(true)}
+          // onShowSettings={() => setShowSettings(true)}
         />
       </div>
 

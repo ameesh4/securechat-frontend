@@ -19,6 +19,7 @@ import {
   Shield,
   MessageSquare,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import type { Conversation } from "./ChatInterface";
 import NewChatPanel from "./NewChatPanel";
 
@@ -29,8 +30,8 @@ interface ConversationListProps {
   user: { id: string; name: string; email: string; role: "user" | "admin" };
   onLogout: () => void;
   onSwitchToAdmin?: () => void;
-  onShowProfile: () => void;
-  onShowSettings: () => void;
+  onShowProfile?: () => void;
+  // onShowSettings: () => void;
 }
 
 export function ConversationList({
@@ -40,9 +41,9 @@ export function ConversationList({
   user,
   onLogout,
   onSwitchToAdmin,
-  onShowProfile,
-  onShowSettings,
-}: ConversationListProps) {
+}: // onShowSettings,
+ConversationListProps) {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [newChatOpen, setNewChatOpen] = useState(false);
 
@@ -96,7 +97,11 @@ export function ConversationList({
                     : "ring-gray-200 group-hover:ring-gray-300"
                 }`}
               >
-                <AvatarImage src={conversation.avatar} />
+                <AvatarImage
+                  src={`https://api.dicebear.com/9.x/adventurer/svg?seed=${
+                    conversation?.name || ""
+                  }`}
+                />
                 <AvatarFallback className="bg-blue-500 text-white font-semibold">
                   {conversation?.name?.[0] || "?"}
                 </AvatarFallback>
@@ -154,7 +159,11 @@ export function ConversationList({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3 min-w-0">
             <Avatar className="ring-2 ring-gray-200">
-              <AvatarImage src="https://images.unsplash.com/photo-1704726135027-9c6f034cfa41?w=150" />
+              <AvatarImage
+                src={`https://api.dicebear.com/9.x/adventurer/svg?seed=${
+                  user?.name || user?.email || ""
+                }`}
+              />
               <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-500 text-white font-semibold">
                 {user?.name?.[0] || user?.email?.[0]?.toUpperCase() || "U"}
               </AvatarFallback>
@@ -184,26 +193,26 @@ export function ConversationList({
               <Button
                 variant="ghost"
                 size="icon"
-                className="hover:bg-gray-100 transition-colors"
+                className="hover:bg-gray-100 transition-colors relative z-10"
               >
                 <Settings className="w-5 h-5 text-gray-600" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuContent align="end" className="w-48 z-50">
               <DropdownMenuItem
-                onClick={onShowProfile}
+                onClick={() => navigate("/profile")}
                 className="cursor-pointer"
               >
                 <User className="w-4 h-4 mr-2" />
                 Profile
               </DropdownMenuItem>
-              <DropdownMenuItem
+              {/* <DropdownMenuItem
                 onClick={onShowSettings}
                 className="cursor-pointer"
               >
                 <Settings className="w-4 h-4 mr-2" />
                 Settings
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
               {onSwitchToAdmin && (
                 <DropdownMenuItem
                   onClick={onSwitchToAdmin}
@@ -225,8 +234,10 @@ export function ConversationList({
           </DropdownMenu>
         </div>
 
-        <div className="absolute bottom-0 left-0 right-0 top-0">
-          <NewChatPanel open={newChatOpen} onOpenChange={setNewChatOpen} />
+        <div className="absolute bottom-0 left-0 right-0 top-0 pointer-events-none">
+          <div className="pointer-events-auto">
+            <NewChatPanel open={newChatOpen} onOpenChange={setNewChatOpen} />
+          </div>
         </div>
       </div>
     </>

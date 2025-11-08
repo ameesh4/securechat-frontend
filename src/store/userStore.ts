@@ -8,6 +8,7 @@ export type UserWithRole = {
   name: string;
   email: string;
   role: "user" | "admin";
+  bio?: string;
 };
 
 interface UserState {
