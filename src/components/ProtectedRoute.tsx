@@ -12,7 +12,6 @@ export function ProtectedRoute({
   requireAdmin = false,
 }: ProtectedRouteProps) {
   const user = useUserStore((state) => state.user);
-  console.log(user);
 
   if (!user) {
     return <Navigate to="/" replace />;

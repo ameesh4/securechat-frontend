@@ -10,7 +10,8 @@ import type { Conversation, Message } from "@/components/ChatInterface";
 import { decryptAESKey, type GoChatSession, type GoUser } from "@/components/NewChatPanel";
 import { AESDecrypt, AESEncrypt, base64ToBigint, base64ToUint8Array, uint8ArrayToBase64 } from "@/utils/AES";
 import type { Socket } from "socket.io-client";
-
+import { fetcher, postRequest } from "@/utils/APIHelper";
+import type { Response } from "@/utils/Response";
 
 export type GoChatMessage = {
   id: number;
@@ -44,6 +45,8 @@ export function ChatPage() {
   const [showProfile, setShowProfile] = useState(false);
 
   const [authSockLoading, setAuthSockLoading] = useState(true);
+  const [sessionLoading, setSessionLoading] = useState(true);
+
   const socketRef = useRef<Socket | null>(null);
 
 
@@ -117,6 +120,7 @@ export function ChatPage() {
       id: msg.id.toString(),
       senderId: msg.sender_id.toString(),
       content: decryptedContent.decrypted,
+      senderName: conversation.name,
       timestamp: new Date().toLocaleTimeString("en-US", {
         hour: "numeric",
         minute: "2-digit",
@@ -134,29 +138,6 @@ export function ChatPage() {
   }, [conversations, setMessages, messages]);
 
 
-  useEffect(() => {
-    const socket = socketRef.current;
-    if (!socket) return;
-    socket.on("auth_success", sockAuthSuccessHandler);
-
-    return () => {
-      if (socket) {
-        socket.off("auth_success", sockAuthSuccessHandler);
-      }
-    };
-  }, [sockAuthSuccessHandler])
-
-  useEffect(() => {
-    const socket = socketRef.current;
-    if (!socket) return;
-    socket.on("auth_error", sockAuthFailHandler);
-
-    return () => {
-      if (socket) {
-        socket.off("auth_error", sockAuthFailHandler);
-      }
-    };
-  }, [sockAuthFailHandler])
 
   useEffect(() => {
     const socket = socketRef.current;
@@ -188,6 +169,56 @@ export function ChatPage() {
     const token =
       sessionStorage.getItem("token") || localStorage.getItem("token");
     sock_emit(socket, "auth", { token });
+    socket.on("auth_success", sockAuthSuccessHandler);
+    socket.on("auth_error", sockAuthFailHandler);
+    const sessionLoader = async () => {
+      const res = await fetcher<Response<GoChatSession[]>>('/chat-session/all');
+      if (res.status) {
+        const encryptedAesKeys: Record<number, string> = {};
+
+        res.data.forEach((session) => {
+          encryptedAesKeys[session.id] = session.a1;
+        })
+
+        const decryptedKeys: { session_id: number, key: CryptoKey }[] = await Promise.all(
+          Object.entries(encryptedAesKeys).map(async ([session_id, a1]) => {
+            const key = await decryptAESKey(a1);
+            return {
+              session_id: Number(session_id),
+              key,
+            }
+          })
+        );
+
+        const conversations: Conversation[] = res.data.map((session) => {
+          return {
+            id: session.id,
+            user_id: session.User2.id,
+            name: session.User2.name,
+            lastMessage: "",
+            timestamp: new Date().toLocaleTimeString("en-US", {
+              hour: "numeric",
+              minute: "2-digit",
+            }),
+            unread: 0,
+            isGroup: false,
+            aes_key: {
+              key: decryptedKeys.find(dk => dk.session_id === session.id)!.key
+            },
+          }
+        })
+        console.log("Loaded conversations:", conversations);
+        setConversations(() => conversations);
+        setSessionLoading(false);
+      }
+    }
+    sessionLoader();
+
+    return () => {
+      socketRef.current = null;
+      socket.off("auth_success", sockAuthSuccessHandler);
+      socket.off("auth_error", sockAuthFailHandler);
+    };
   }, []);
 
   const handleSendMessage = async (content: string) => {
@@ -215,6 +246,7 @@ export function ChatPage() {
     const newMessage: Message = {
       id: Date.now().toString(),
       senderId: user!.id,
+      senderName: user!.name,
       content,
       timestamp: new Date().toLocaleTimeString("en-US", {
         hour: "numeric",

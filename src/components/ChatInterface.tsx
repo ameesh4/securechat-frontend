@@ -28,6 +28,7 @@ export interface Conversation {
 export interface Message {
   id: string;
   senderId: string;
+  senderName: string;
   content: string;
   timestamp: string;
   isOwn: boolean;
@@ -53,6 +54,7 @@ export function ChatInterface({
     const newMessage: Message = {
       id: Date.now().toString(),
       senderId: "me",
+      senderName: user.name,
       content,
       timestamp: new Date().toLocaleTimeString("en-US", {
         hour: "numeric",

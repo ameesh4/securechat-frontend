@@ -23,34 +23,29 @@ interface UserState {
 }
 
 export const useUserStore = create<UserState>()(
-  persist(
-    (set) => ({
-      user: null,
-      currentScreen: "auth",
-      setUser: (user) => set({ user }),
-      setCurrentScreen: (screen) => set({ currentScreen: screen }),
-      login: (userData) =>
-        set({
-          user: userData,
-          currentScreen: userData.role === "admin" ? "admin" : "chat",
-        }),
-      logout: () =>
-        set({
-          user: null,
-          currentScreen: "auth",
-        }),
-      switchToAdmin: () =>
-        set((state) => {
-          if (state.user?.role === "admin") {
-            return { currentScreen: "admin" };
-          }
-          return state;
-        }),
-      switchToChat: () => set({ currentScreen: "chat" }),
-    }),
-    {
-      name: "user-storage",
-      partialize: (state) => ({ user: state.user }),
-    }
-  )
+
+  (set) => ({
+    user: null,
+    currentScreen: "auth",
+    setUser: (user) => set({ user }),
+    setCurrentScreen: (screen) => set({ currentScreen: screen }),
+    login: (userData) =>
+      set({
+        user: userData,
+        currentScreen: userData.role === "admin" ? "admin" : "chat",
+      }),
+    logout: () =>
+      set({
+        user: null,
+        currentScreen: "auth",
+      }),
+    switchToAdmin: () =>
+      set((state) => {
+        if (state.user?.role === "admin") {
+          return { currentScreen: "admin" };
+        }
+        return state;
+      }),
+    switchToChat: () => set({ currentScreen: "chat" }),
+  })
 );

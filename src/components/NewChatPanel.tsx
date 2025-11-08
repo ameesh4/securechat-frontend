@@ -86,7 +86,7 @@ export default function NewChatPanel({
     setLoading(true);
     const res = await axiosInstance.post<Response<ChatSessionRequestResponse>>("/chat-session/request", { email })
 
-    if (res.data.success === false) {
+    if (res.data.status === false) {
       setLoading(false);
       alert(res.data.error || "Failed to create chat session");
       return;
@@ -125,7 +125,7 @@ export default function NewChatPanel({
       a2: encrypted_AES_key_for_other_b64,
     })
 
-    if (res_create.data.success === false) {
+    if (res_create.data.status === false) {
       setLoading(false);
       alert(res_create.data.error || "Failed to create chat session");
       return;
@@ -174,6 +174,7 @@ export default function NewChatPanel({
           onSubmit={(e) => {
             e.preventDefault()
             onSubmit(email)
+            onOpenChange(false);
           }}>
             <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)}></Input>
             <Button type="submit" variant="outline">Start</Button>
