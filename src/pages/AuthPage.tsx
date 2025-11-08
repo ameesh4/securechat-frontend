@@ -83,6 +83,11 @@ export function AuthPage() {
       });
       if (response) {
         localStorage.setItem("private_key", b64_private_key);
+        localStorage.setItem("public_key", b64_public_key);
+
+        console.log("Public Key (Base64):", b64_public_key);
+        console.log("Private Key (Base64):", b64_private_key);
+        
         toast.success("Signup successful!", {
           description: "You can now login to your account.",
         });
