@@ -102,7 +102,7 @@ export function ChatPage() {
   const [messages, setMessages] =
     useState<Record<string, Message[]>>(mockMessages);
   const [showProfile, setShowProfile] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
+  // const [showSettings, setShowSettings] = useState(false);
 
   const [authSockLoading, setAuthSockLoading] = useState(true);
 
@@ -118,19 +118,16 @@ export function ChatPage() {
     navigate("/admin");
   };
 
-
   const sockAuthSuccessHandler = useCallback(() => {
-    setAuthSockLoading(false)
-  }, [setAuthSockLoading])
-
-
+    setAuthSockLoading(false);
+  }, [setAuthSockLoading]);
 
   useEffect(() => {
     const socket = getSocket();
-    
-    
-    const token = sessionStorage.getItem("token") || localStorage.getItem("token");
-    sock_emit(socket,"auth", { token });
+
+    const token =
+      sessionStorage.getItem("token") || localStorage.getItem("token");
+    sock_emit(socket, "auth", { token });
     socket.on("auth_success", sockAuthSuccessHandler);
 
     return () => {
@@ -190,7 +187,7 @@ export function ChatPage() {
             user.role === "admin" ? handleSwitchToAdmin : undefined
           }
           onShowProfile={() => setShowProfile(true)}
-          onShowSettings={() => setShowSettings(true)}
+          // onShowSettings={() => setShowSettings(true)}
         />
       </div>
 
@@ -227,9 +224,9 @@ export function ChatPage() {
       )}
 
       {/* Settings Panel */}
-      {showSettings && (
+      {/* {showSettings && (
         <SettingsPanel user={user} onClose={() => setShowSettings(false)} />
-      )}
+      )} */}
     </div>
   );
 }

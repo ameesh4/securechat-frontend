@@ -9,23 +9,27 @@ import {
 import { AuthPage } from "./pages/AuthPage";
 import { ChatPage } from "./pages/ChatPage";
 import { AdminPage } from "./pages/AdminPage";
+import { ProfilePage } from "./pages/ProfilePage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { useUserStore } from "./store/userStore";
 import { validateToken } from "./utils/API";
-
 
 function AppRoutes() {
   const user = useUserStore((state) => state.user);
   const navigate = useNavigate();
   const setUser = useUserStore((state) => state.setUser);
   const authenticateUser = async () => {
+    const pathname = window.location.pathname;
+    if (pathname != "/") {
+      return;
+    }
     const token = localStorage.getItem("token");
     try {
       if (token) {
         const response = await validateToken();
         setUser({
           id: response.id,
-          name: response.name,
+          name: response.name || "",
           email: response.email,
           role: response.is_admin ? "admin" : "user",
         });
@@ -83,6 +87,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute requireAdmin>
             <AdminPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <ProfilePage />
           </ProtectedRoute>
         }
       />

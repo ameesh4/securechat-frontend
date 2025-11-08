@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { Send, MoreVertical, Phone, Video } from "lucide-react";
+import { Send } from "lucide-react";
 import type { Conversation, Message } from "./ChatInterface";
 import React from "react";
 
@@ -44,7 +44,11 @@ export function ChatWindow({
           <div className="flex items-center gap-4">
             <div className="relative">
               <Avatar className="w-12 h-12 ring-2 ring-blue-100">
-                <AvatarImage src={conversation.avatar} />
+                <AvatarImage
+                  src={`https://api.dicebear.com/9.x/adventurer/svg?seed=${
+                    conversation?.name || ""
+                  }`}
+                />
                 <AvatarFallback className="bg-blue-500 text-white font-semibold text-lg">
                   {conversation?.name?.[0] || "?"}
                 </AvatarFallback>
@@ -67,7 +71,6 @@ export function ChatWindow({
               </p>
             </div>
           </div>
-          
         </div>
       </div>
 
@@ -77,7 +80,11 @@ export function ChatWindow({
           <div className="flex flex-col items-center justify-center h-full text-center px-4">
             <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center mb-4">
               <Avatar className="w-16 h-16 ring-2 ring-blue-200">
-                <AvatarImage src={conversation.avatar} />
+                <AvatarImage
+                  src={`https://api.dicebear.com/9.x/adventurer/svg?seed=${
+                    conversation?.name || ""
+                  }`}
+                />
                 <AvatarFallback className="bg-blue-500 text-white text-2xl font-semibold">
                   {conversation?.name?.[0] || "?"}
                 </AvatarFallback>
@@ -112,7 +119,11 @@ export function ChatWindow({
                 >
                   {!message.isOwn && (
                     <Avatar className="w-8 h-8 ring-1 ring-gray-200">
-                      <AvatarImage src={conversation.avatar} />
+                      <AvatarImage
+                        src={`https://api.dicebear.com/9.x/adventurer/svg?seed=${
+                          message?.senderName || ""
+                        }`}
+                      />
                       <AvatarFallback className="bg-blue-500 text-white text-xs">
                         {message?.senderName?.[0] || "?"}
                       </AvatarFallback>

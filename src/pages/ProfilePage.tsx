@@ -3,12 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import { Avatar, AvatarImage } from "../components/ui/avatar";
-import {  Save, ArrowLeft, Loader2 } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
+import { Camera, Save, ArrowLeft, Loader2 } from "lucide-react";
 import { useUserStore } from "../store/userStore";
 import type { User } from "../types/User";
 import type { IResponse } from "@/utils/axiosInstance";
-import { fetcher, putRequest } from "@/utils/APIHelper";
+import { fetcher, postRequest, putRequest } from "@/utils/APIHelper";
 import { toast } from "sonner";
 
 export function ProfilePage() {

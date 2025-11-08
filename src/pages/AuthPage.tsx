@@ -45,7 +45,7 @@ export function AuthPage() {
         localStorage.setItem("token", response.token);
         setUser({
           id: response.user.id,
-          name: response.user.name,
+          name: response.user.name || "",
           email: response.user.email,
           role: response.user.is_admin ? "admin" : "user",
         });
@@ -76,6 +76,7 @@ export function AuthPage() {
       const b64_private_key = bigintToBase64(keyPair.d);
 
       const response = await signup({
+        name: name || "",
         email,
         password,
         public_key: b64_public_key,
