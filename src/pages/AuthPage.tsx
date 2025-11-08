@@ -87,7 +87,7 @@ export function AuthPage() {
 
         console.log("Public Key (Base64):", b64_public_key);
         console.log("Private Key (Base64):", b64_private_key);
-        
+
         toast.success("Signup successful!", {
           description: "You can now login to your account.",
         });
@@ -201,16 +201,6 @@ export function AuthPage() {
                       />
                     </div>
                   </div>
-                  <div className="flex items-center justify-end">
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab("reset")}
-                      className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
-                      disabled={isLoading}
-                    >
-                      Forgot password?
-                    </button>
-                  </div>
                 </CardContent>
                 <CardFooter className="flex flex-col gap-2 pt-4">
                   <Button
@@ -237,7 +227,7 @@ export function AuthPage() {
             className="animate-in fade-in slide-in-from-bottom-2 duration-300 mt-4"
           >
             <Card className="border-0 shadow-xl shadow-blue-500/10">
-              <CardHeader className="space-y-1 pb-4">
+              <CardHeader className="space-y-1">
                 <CardTitle className="text-2xl font-semibold">
                   Create an account
                 </CardTitle>
