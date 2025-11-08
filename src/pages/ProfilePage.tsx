@@ -120,11 +120,11 @@ export function ProfilePage() {
                       user?.name || user?.email || ""
                     }`}
                   />
-                  <AvatarFallback className="text-2xl">
+                  {/* <AvatarFallback className="text-2xl">
                     {name[0]?.toUpperCase() ||
                       user?.name[0]?.toUpperCase() ||
                       "U"}
-                  </AvatarFallback>
+                  </AvatarFallback> */}
                 </Avatar>
                 {/* <Button
                   size="icon"
