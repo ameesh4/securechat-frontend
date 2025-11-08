@@ -43,17 +43,6 @@ function AppRoutes() {
     authenticateUser();
   }, []);
 
-  useEffect(() => {
-    const socket = initSocket();
-
-    socket.on("welcome", (msg) => console.log("👋", msg));
-
-    socket.on("message", (data) => {
-      console.log("📩 Received:", data);
-      // You could dispatch this to Redux/store
-    });
-  }, []);
-
   return (
     <Routes>
       <Route
