@@ -53,9 +53,6 @@ export function ChatWindow({
                   {conversation?.name?.[0] || "?"}
                 </AvatarFallback>
               </Avatar>
-              {conversation.isOnline && (
-                <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white shadow-sm" />
-              )}
             </div>
             <div>
               <p className="font-semibold text-gray-900 text-base">

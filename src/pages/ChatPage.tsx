@@ -22,8 +22,8 @@ export type GoChatMessage = {
   iv: string;
 
   is_read: boolean;
-  created_at: string;
-  updated_at: string;
+  created_at: number;
+  updated_at: number;
 
   Sender: GoUser;
   Receiver: GoUser;
@@ -41,14 +41,13 @@ export function ChatPage() {
     useState<Conversation | null>(null);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [messages, setMessages] =
-    useState<Record<string, Message[]>>({});
+    useState<Record<string, { messages?: Message[], allLoaded?: boolean, loading?: boolean }>>({});
   const [showProfile, setShowProfile] = useState(false);
 
   const [authSockLoading, setAuthSockLoading] = useState(true);
   const [sessionLoading, setSessionLoading] = useState(true);
 
   const socketRef = useRef<Socket | null>(null);
-
 
   const handleLogout = () => {
     logout();
@@ -128,16 +127,19 @@ export function ChatPage() {
       isOwn: false,
     };
 
+
+
     setMessages((prev) => ({
       ...prev,
-      [conversation.id]: [
-        ...(prev[conversation.id] || []),
-        newMessage,
-      ],
+      [conversation.id]: {
+        ...{
+          messages: [...(prev[conversation.id]?.messages || []), newMessage],
+          allLoaded: prev[conversation.id]?.allLoaded || false,
+          loading: false,
+        }
+      },
     }));
   }, [conversations, setMessages, messages]);
-
-
 
   useEffect(() => {
     const socket = socketRef.current;
@@ -210,6 +212,7 @@ export function ChatPage() {
         console.log("Loaded conversations:", conversations);
         setConversations(() => conversations);
         setSessionLoading(false);
+        setSelectedConversation(conversations[0] || null);
       }
     }
     sessionLoader();
@@ -220,6 +223,55 @@ export function ChatPage() {
       socket.off("auth_error", sockAuthFailHandler);
     };
   }, []);
+
+  useEffect(() => {
+    if (!selectedConversation) return;
+    if (messages[selectedConversation.id]?.allLoaded) return;
+    const loadMessages = async () => {
+      const res = await fetcher<Response<GoChatMessage[]>>(`/chat-message?session_id=${selectedConversation.id}`);
+      if (res.status) {
+        setMessages((prev) => ({
+          ...prev,
+          [selectedConversation.id]: {
+            ...prev[selectedConversation.id],
+            loading: true,
+          },
+        }));
+        const msgs: Message[] = await Promise.all(
+          res.data.map(async (msg) => {
+            const aes_key = selectedConversation.aes_key.key;
+
+            const encryptedContent = base64ToUint8Array(msg.content);
+            const iv = base64ToUint8Array(msg.iv);
+
+            const decryptedContent = await AESDecrypt(encryptedContent, aes_key, iv)
+
+            return {
+              id: msg.id.toString(),
+              senderId: msg.sender_id.toString(),
+              content: decryptedContent.decrypted,
+              senderName: msg.Sender.name,
+              timestamp: new Date(msg.created_at*1000).toLocaleTimeString("en-US", {
+                hour: "numeric",
+                minute: "2-digit",
+              }),
+              isOwn: msg.sender_id.toString() === user!.id.toString(),
+            };
+          })
+        );
+        const oldMessages = messages[selectedConversation.id]?.messages || [];
+        setMessages((prev) => ({
+          ...prev,
+          [selectedConversation.id]: {
+            messages: [...oldMessages, ...msgs],
+            allLoaded: true,
+            loading: false,
+          },
+        }));
+      }
+    }
+    loadMessages();
+  }, [selectedConversation])
 
   const handleSendMessage = async (content: string) => {
     if (!selectedConversation) return;
@@ -257,10 +309,13 @@ export function ChatPage() {
 
     setMessages((prev) => ({
       ...prev,
-      [selectedConversation.id]: [
-        ...(prev[selectedConversation.id] || []),
-        newMessage,
-      ],
+      [selectedConversation.id]: {
+        ...{
+          messages: [...(prev[selectedConversation.id]?.messages || []), newMessage],
+          allLoaded: prev[selectedConversation.id]?.allLoaded || false,
+          loading: false,
+        }
+      },
     }));
   };
 
@@ -272,7 +327,9 @@ export function ChatPage() {
   if (authSockLoading) {
     return <div>Authenticating connection...</div>;
   }
-
+  if (sessionLoading) {
+    return <div>Loading Conversations</div>
+  }
   return (
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar with conversations */}
@@ -299,7 +356,7 @@ export function ChatPage() {
         {selectedConversation ? (
           <ChatWindow
             conversation={selectedConversation}
-            messages={messages[selectedConversation.id] || []}
+            messages={messages[selectedConversation.id]?.messages || []}
             onSendMessage={handleSendMessage}
           />
         ) : (

@@ -80,7 +80,7 @@ ConversationListProps) {
       </div>
 
       {/* Conversations List */}
-      <div className="flex-1 overflow-y-auto bg-white">
+      <div className="flex-1 overflow-y-auto bg-white gap-2">
         {filteredConversations.map((conversation) => (
           <button
             key={conversation.id}

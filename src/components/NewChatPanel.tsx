@@ -27,16 +27,16 @@ export type GoUser = {
   refresh_token: string;
   is_admin: boolean;
   public_key: string;
-  created_at: string;
-  updated_at: string;
+  created_at: number;
+  updated_at: number;
 }
 
 export type GoChatSession = {
   id: number;
   participant1: string;
   participant2: string;
-  created_at: string;
-  updated_at: string;
+  created_at: number;
+  updated_at: number;
 
   a1: string;
   a2: string;
