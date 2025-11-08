@@ -41,8 +41,8 @@ type GoChatSession = {
   a1: string;
   a2: string;
 
-  user1: GoUser;
-  user2: GoUser;
+  User1: GoUser;
+  User2: GoUser;
 }
 
 
@@ -132,7 +132,7 @@ export default function NewChatPanel({
 
     const newConversation: Conversation = {
       id: chat_session.id.toString(),
-      name: chat_session.user2.name,
+      name: chat_session.User2.name,
       lastMessage: "",
       timestamp: new Date().toLocaleTimeString("en-US", {
         hour: "numeric",
