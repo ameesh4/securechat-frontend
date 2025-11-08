@@ -7,7 +7,7 @@ import { SettingsPanel } from "../components/SettingsPanel";
 import { useUserStore } from "../store/userStore";
 import { getSocket, sock_emit } from "../utils/Socket";
 import { MessageSquare } from "lucide-react";
-import { io } from "socket.io-client";
+
 
 export interface Conversation {
   id: string;
@@ -18,6 +18,9 @@ export interface Conversation {
   unread: number;
   isGroup: boolean;
   isOnline?: boolean;
+  aes_key: {
+    key: CryptoKey
+  }
 }
 
 export interface Message {

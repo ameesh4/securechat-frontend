@@ -21,6 +21,7 @@ type ChatSessionRequestResponse = {
 
 type GoUser = {
   id: number;
+  name: string;
   email: string;
   password: string;
   refresh_token: string;
@@ -39,6 +40,9 @@ type GoChatSession = {
 
   a1: string;
   a2: string;
+
+  user1: GoUser;
+  user2: GoUser;
 }
 
 
@@ -56,8 +60,6 @@ export default function NewChatPanel({
   const [email, setEmail] = useState("")
   const [loading, setLoading] = useState(false)
   const onSubmit = async (email: string) => {
-
-
 
     if (loading) return;
     setLoading(true);
@@ -120,6 +122,7 @@ export default function NewChatPanel({
       alert("FATAL ERROR: Private key not found");
       return;
     }
+    
     const my_private_key = base64ToBigint(my_private_key_base_64);
     const my_exported_aes_key =  RSADecrypt(my_server_aes_key_encrypted, {
       n: my_public_key,
@@ -129,7 +132,7 @@ export default function NewChatPanel({
 
     const newConversation: Conversation = {
       id: chat_session.id.toString(),
-      name: email,
+      name: chat_session.user2.name,
       lastMessage: "",
       timestamp: new Date().toLocaleTimeString("en-US", {
         hour: "numeric",
