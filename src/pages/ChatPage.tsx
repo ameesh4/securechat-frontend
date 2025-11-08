@@ -1,12 +1,13 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ConversationList } from "../components/ConversationList";
 import { ChatWindow } from "../components/ChatWindow";
 import { UserProfile } from "../components/UserProfile";
 import { SettingsPanel } from "../components/SettingsPanel";
 import { useUserStore } from "../store/userStore";
-import { getSocket } from "../utils/Socket";
+import { getSocket, sock_emit } from "../utils/Socket";
 import { MessageSquare } from "lucide-react";
+import { io } from "socket.io-client";
 
 export interface Conversation {
   id: string;
@@ -141,6 +142,8 @@ const mockMessages: Record<string, Message[]> = {
   ],
 };
 
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || "http://localhost:8080";
+
 export function ChatPage() {
   const navigate = useNavigate();
   const user = useUserStore((state) => state.user);
@@ -155,6 +158,8 @@ export function ChatPage() {
   const [showProfile, setShowProfile] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
+  const [authSockLoading, setAuthSockLoading] = useState(true);
+
   const handleLogout = () => {
     logout();
     navigate("/");
@@ -165,11 +170,26 @@ export function ChatPage() {
     navigate("/admin");
   };
 
+
+  const sockAuthSuccessHandler = useCallback(() => {
+    setAuthSockLoading(false)
+  }, [setAuthSockLoading])
+
+
+
   useEffect(() => {
     const socket = getSocket();
-    if (socket) {
-      socket.emit("message", "Hello from frontend");
-    }
+    
+    
+    const token = sessionStorage.getItem("token") || localStorage.getItem("token");
+    sock_emit(socket,"auth", { token });
+    socket.on("auth_success", sockAuthSuccessHandler);
+
+    return () => {
+      if (socket) {
+        socket.off("auth_success", sockAuthSuccessHandler);
+      }
+    };
   }, []);
 
   const handleSendMessage = (content: string) => {
@@ -199,6 +219,10 @@ export function ChatPage() {
   if (!user) {
     navigate("/");
     return null;
+  }
+
+  if (authSockLoading) {
+    return <div>Authenticating connection...</div>;
   }
 
   return (
