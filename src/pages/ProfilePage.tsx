@@ -229,19 +229,6 @@ export function ProfilePage() {
             </Button>
           </div>
         </div>
-
-        {/* Additional Info Section */}
-        <div className="mt-6 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            Account Information
-          </h2>
-          <div className="space-y-3 text-sm">
-            <div className="flex justify-between">
-              <span className="text-gray-600">Role:</span>
-              <span className="text-gray-900 capitalize">{user?.role}</span>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
