@@ -145,7 +145,7 @@ export function AuthPage() {
             className="animate-in fade-in slide-in-from-bottom-2 duration-300 mt-4"
           >
             <Card className="border-0 shadow-xl shadow-blue-500/10">
-              <CardHeader className="space-y-1 pb-4">
+              <CardHeader className="space-y-1">
                 <CardTitle className="text-2xl font-semibold">
                   Welcome back
                 </CardTitle>
